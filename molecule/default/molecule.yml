@@ -1,0 +1,43 @@
+dependency: 
+  name: galaxy
+driver: 
+  name: docker
+lint: |
+    set -e
+    yamllint .
+    ansible-lint .
+    options:
+      config-file: molecule/default/yamllint.yml
+platforms: 
+  - 
+    command: "${MOLECULE_COMMAND:-\"\"}"
+    image: geerlingguy/docker-debian9-ansible
+    name: ansible-role-monica-test
+    pre_build_image: true
+    privileged: true
+    volumes: 
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+provisioner: 
+  lint: 
+    name: ansible-lint
+    options: 
+      exclude: 
+        - molecule/default/playbook.yml
+      x: 
+        - 204
+        - 403
+        - 502
+  name: ansible
+  playbooks: 
+    converge: "${MOLECULE_PLAYBOOK:-playbook.yml}"
+scenario: 
+  name: default
+skip_list: 
+  - "201"
+  - "701"
+  - "703"
+verifier: 
+  lint: 
+    name: flake8
+  name: testinfra
+
